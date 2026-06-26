@@ -1,0 +1,32 @@
+name: CodSpeed
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  benchmarks:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure benchmark build
+        run: cmake --preset relwithdebinfo-simulation
+
+      - name: Build benchmark target
+        run: cmake --build --preset relwithdebinfo-simulation --target spacrow_bench
+
+      - name: Run CodSpeed benchmarks
+        uses: CodSpeedHQ/action@v4
+        with:
+          mode: simulation
+          run: ./build/relwithdebinfo-simulation/spacrow_bench

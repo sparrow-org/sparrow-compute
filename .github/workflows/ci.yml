@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake --preset relwithdebinfo-no-codspeed
+
+      - name: Build tests
+        run: cmake --build --preset relwithdebinfo-no-codspeed --target spacrow_tests
+
+      - name: Run tests
+        run: ctest --preset relwithdebinfo-no-codspeed
