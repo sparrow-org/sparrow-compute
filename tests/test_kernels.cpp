@@ -1,6 +1,3 @@
-/// @file test_kernels.cpp
-/// @brief GoogleTest cases for spacrow compute kernels.
-
 #include <gtest/gtest.h>
 
 #include <sparrow/primitive_array.hpp>

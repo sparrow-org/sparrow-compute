@@ -1,16 +1,3 @@
-/// @file bench_kernels.cpp
-/// @brief Microbenchmarks comparing elementwise kernels implemented over
-/// sparrow primitive arrays (via the spacrow kernels, which adapt the Arrow
-/// value buffer into an xtensor expression) against the same kernels
-/// implemented directly over xtensor-owned containers (`xt::xtensor<T, 1>`).
-///
-/// The goal is to quantify the overhead — if any — introduced by the sparrow
-/// adaptor layer and the result construction (which copies through a
-/// `std::vector` into a new Arrow buffer).
-///
-/// Build: `cmake --build build/default --target spacrow_bench`
-/// Run:   `./build/default/spacrow_bench`
-
 #include <benchmark/benchmark.h>
 
 #include <vector>

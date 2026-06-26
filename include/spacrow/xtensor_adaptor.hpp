@@ -15,13 +15,14 @@
 
 #include <cstddef>
 
+#include <xtensor/containers/xadapt.hpp>
+#include <xtensor/containers/xtensor.hpp>
+#include <xtensor/core/xnoalias.hpp>
+
 #include <sparrow/arrow_interface/arrow_array_schema_proxy.hpp>
 #include <sparrow/buffer/buffer_view.hpp>
 #include <sparrow/layout/array_access.hpp>
 #include <sparrow/primitive_array.hpp>
-
-#include <xtensor/containers/xadapt.hpp>
-#include <xtensor/containers/xtensor.hpp>
 
 namespace spacrow
 {
@@ -52,5 +53,34 @@ namespace spacrow
     {
         const auto data = detail::view_data(arr);
         return xt::adapt(data.data(), data.size(), xt::no_ownership());
+    }
+
+    /// Build a sparrow primitive array from an xtensor expression
+    /// with zero-copy evaluation.
+    ///
+    /// Allocates a buffer compatible with sparrow's allocator, evaluates
+    /// the xtensor expression directly into it via `xt::noalias` (no
+    /// temporary variable, no intermediate heap allocation), then
+    /// transfers ownership of the buffer to sparrow via
+    /// `u8_buffer<T>(T*, count, alloc)`.
+    ///
+    /// This is the single-allocation path: the only heap allocation is
+    /// the sparrow Arrow buffer itself, matching pure xtensor performance.
+    template <class T, class E>
+    [[nodiscard]] sparrow::primitive_array<T> to_sparrow(E&& expr)
+    {
+        using alloc_type = typename sparrow::u8_buffer<T>::default_allocator;
+        alloc_type alloc;
+
+        const auto n = static_cast<std::size_t>(expr.shape()[0]);
+
+        auto* raw_bytes = alloc.allocate(n * sizeof(T));
+        auto* typed = reinterpret_cast<T*>(raw_bytes);
+
+        auto view = xt::adapt(typed, n, xt::no_ownership());
+        xt::noalias(view) = std::forward<E>(expr);
+
+        sparrow::u8_buffer<T> buf(typed, n, alloc);
+        return sparrow::primitive_array<T>(std::move(buf), n, /*nullable=*/false);
     }
 }  // namespace spacrow

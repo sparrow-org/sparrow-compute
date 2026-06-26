@@ -52,12 +52,6 @@ namespace
         print("a - b    ", diff);
         print("a * b    ", prod);
         print("a / b    ", quot);
-
-        // In-place variant: reuse an output array. sparrow primitive arrays
-        // have no default constructor, so initialize from an empty range.
-        sparrow::primitive_array<double> out{std::vector<double>{}};
-        spacrow::add(a, b, out);
-        print("in-place ", out);
     }
 
     void demo_ints()
