@@ -29,7 +29,7 @@ namespace spacrow
         template <class T>
         inline void ensure_same_size(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
         {
-            if (detail::size_of(a) != detail::size_of(b))
+            if (a.size() != b.size())
             {
                 throw std::invalid_argument("spacrow kernels require equal-length inputs");
             }
@@ -64,17 +64,6 @@ namespace spacrow
             return sparrow::primitive_array<T>(std::move(buf), n, /*nullable=*/false);
         }
 
-        template <class T, class E>
-        void assign_to(sparrow::primitive_array<T>& out,
-                       std::size_t expected_size,
-                       E&& expr)
-        {
-            if (out.size() != expected_size)
-            {
-                out.resize(expected_size, sparrow::nullable<T>(T{}));
-            }
-            xt::noalias(as_xtensor_view(out)) = std::forward<E>(expr);
-        }
     }  // namespace detail
 
     // -------------------------------------------------------------------------
@@ -127,55 +116,4 @@ namespace spacrow
         return detail::to_sparrow<T>(a_view / b_view);
     }
 
-    // -------------------------------------------------------------------------
-    // In-place kernels — write into a caller-provided output array
-    // -------------------------------------------------------------------------
-
-    /// @brief In-place addition: `out = a + b`.
-    template <class T>
-    void add(const sparrow::primitive_array<T>& a,
-             const sparrow::primitive_array<T>& b,
-             sparrow::primitive_array<T>& out)
-    {
-        detail::ensure_same_size(a, b);
-        auto a_view = as_xtensor_view(a);
-        auto b_view = as_xtensor_view(b);
-        detail::assign_to(out, a_view.size(), a_view + b_view);
-    }
-
-    /// @brief In-place subtraction: `out = a - b`.
-    template <class T>
-    void subtract(const sparrow::primitive_array<T>& a,
-                  const sparrow::primitive_array<T>& b,
-                  sparrow::primitive_array<T>& out)
-    {
-        detail::ensure_same_size(a, b);
-        auto a_view = as_xtensor_view(a);
-        auto b_view = as_xtensor_view(b);
-        detail::assign_to(out, a_view.size(), a_view - b_view);
-    }
-
-    /// @brief In-place multiplication: `out = a * b`.
-    template <class T>
-    void multiply(const sparrow::primitive_array<T>& a,
-                  const sparrow::primitive_array<T>& b,
-                  sparrow::primitive_array<T>& out)
-    {
-        detail::ensure_same_size(a, b);
-        auto a_view = as_xtensor_view(a);
-        auto b_view = as_xtensor_view(b);
-        detail::assign_to(out, a_view.size(), a_view * b_view);
-    }
-
-    /// @brief In-place division: `out = a / b`.
-    template <class T>
-    void divide(const sparrow::primitive_array<T>& a,
-                const sparrow::primitive_array<T>& b,
-                sparrow::primitive_array<T>& out)
-    {
-        detail::ensure_same_size(a, b);
-        auto a_view = as_xtensor_view(a);
-        auto b_view = as_xtensor_view(b);
-        detail::assign_to(out, a_view.size(), a_view / b_view);
-    }
 }  // namespace spacrow

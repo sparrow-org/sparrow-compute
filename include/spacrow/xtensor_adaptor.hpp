@@ -27,13 +27,6 @@ namespace spacrow
 {
     namespace detail
     {
-        template <typename T>
-        struct array_view_data
-        {
-            T* ptr;
-            std::size_t size;
-        };
-
         /// @brief Get a raw pointer to the contiguous value buffer of a
         /// sparrow primitive array.
         ///
@@ -42,17 +35,7 @@ namespace spacrow
         /// is the validity bitmap, index 1 is the values buffer) and applies
         /// the array's logical offset.
         template <typename T>
-        [[nodiscard]] array_view_data<T> view_data(sparrow::primitive_array<T>& arr)
-        {
-            auto& proxy = sparrow::detail::array_access::get_arrow_proxy(arr);
-            return {
-                proxy.buffers()[1].template data<T>() + static_cast<std::size_t>(proxy.offset()),
-                static_cast<std::size_t>(proxy.length())
-            };
-        }
-
-        template <typename T>
-        [[nodiscard]] array_view_data<const T> view_data(const sparrow::primitive_array<T>& arr)
+        [[nodiscard]] std::span<const T> view_data(const sparrow::primitive_array<T>& arr)
         {
             const auto& proxy = sparrow::detail::array_access::get_arrow_proxy(arr);
             return {
@@ -60,38 +43,7 @@ namespace spacrow
                 static_cast<std::size_t>(proxy.length())
             };
         }
-
-        template <typename T>
-        [[nodiscard]] T* raw_data(sparrow::primitive_array<T>& arr)
-        {
-            return view_data(arr).ptr;
-        }
-
-        template <typename T>
-        [[nodiscard]] const T* raw_data(const sparrow::primitive_array<T>& arr)
-        {
-            return view_data(arr).ptr;
-        }
-
-        /// @brief Number of logical elements in a sparrow primitive array.
-        template <typename T>
-        [[nodiscard]] std::size_t size_of(const sparrow::primitive_array<T>& arr)
-        {
-            return view_data(arr).size;
-        }
     }  // namespace detail
-
-    /// @brief Wrap a mutable sparrow primitive array as a 1-D xtensor adaptor.
-    ///
-    /// The adaptor references the array's value buffer with `no_ownership`:
-    /// writes to the adaptor mutate the array in place, and the array must
-    /// outlive the adaptor.
-    template <typename T>
-    [[nodiscard]] auto as_xtensor_view(sparrow::primitive_array<T>& arr)
-    {
-        const auto data = detail::view_data(arr);
-        return xt::adapt(data.ptr, data.size, xt::no_ownership());
-    }
 
     /// @brief Wrap a const sparrow primitive array as a 1-D xtensor adaptor.
     /// Const overload: the adaptor exposes the buffer read-only.
@@ -99,6 +51,6 @@ namespace spacrow
     [[nodiscard]] auto as_xtensor_view(const sparrow::primitive_array<T>& arr)
     {
         const auto data = detail::view_data(arr);
-        return xt::adapt(data.ptr, data.size, xt::no_ownership());
+        return xt::adapt(data.data(), data.size(), xt::no_ownership());
     }
 }  // namespace spacrow

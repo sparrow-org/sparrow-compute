@@ -114,86 +114,6 @@ void bench_sparrow_add(benchmark::State& state)
         state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
     }
 
-    template <class T>
-    void bench_sparrow_add_reuse(benchmark::State& state)
-    {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
-        auto va = make_input<T>(n, T{1});
-        auto vb = make_input<T>(n, T{2});
-        sparrow::primitive_array<T> a(va);
-        sparrow::primitive_array<T> b(vb);
-        sparrow::primitive_array<T> out{std::vector<T>(n)};
-
-        for (auto _ : state)
-        {
-            spacrow::add(a, b, out);
-            benchmark::DoNotOptimize(out);
-            benchmark::ClobberMemory();
-        }
-        state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
-        state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
-    }
-
-    template <class T>
-    void bench_sparrow_subtract_reuse(benchmark::State& state)
-    {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
-        auto va = make_input<T>(n, T{1});
-        auto vb = make_input<T>(n, T{2});
-        sparrow::primitive_array<T> a(va);
-        sparrow::primitive_array<T> b(vb);
-        sparrow::primitive_array<T> out{std::vector<T>(n)};
-
-        for (auto _ : state)
-        {
-            spacrow::subtract(a, b, out);
-            benchmark::DoNotOptimize(out);
-            benchmark::ClobberMemory();
-        }
-        state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
-        state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
-    }
-
-    template <class T>
-    void bench_sparrow_multiply_reuse(benchmark::State& state)
-    {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
-        auto va = make_input<T>(n, T{1});
-        auto vb = make_input<T>(n, T{2});
-        sparrow::primitive_array<T> a(va);
-        sparrow::primitive_array<T> b(vb);
-        sparrow::primitive_array<T> out{std::vector<T>(n)};
-
-        for (auto _ : state)
-        {
-            spacrow::multiply(a, b, out);
-            benchmark::DoNotOptimize(out);
-            benchmark::ClobberMemory();
-        }
-        state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
-        state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
-    }
-
-    template <class T>
-    void bench_sparrow_divide_reuse(benchmark::State& state)
-    {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
-        auto va = make_input<T>(n, T{1});
-        auto vb = make_input<T>(n, T{2});
-        sparrow::primitive_array<T> a(va);
-        sparrow::primitive_array<T> b(vb);
-        sparrow::primitive_array<T> out{std::vector<T>(n)};
-
-        for (auto _ : state)
-        {
-            spacrow::divide(a, b, out);
-            benchmark::DoNotOptimize(out);
-            benchmark::ClobberMemory();
-        }
-        state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
-        state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
-    }
-
     // -------------------------------------------------------------------------
     // xtensor-vector kernels (functional: return a new xt::xtensor<T, 1>)
     // -------------------------------------------------------------------------
@@ -275,10 +195,6 @@ void bench_sparrow_add(benchmark::State& state)
     BENCHMARK_TEMPLATE(bench_sparrow_subtract, T)->RangeMultiplier(10)->Range(100, 1000000); \
     BENCHMARK_TEMPLATE(bench_sparrow_multiply, T)->RangeMultiplier(10)->Range(100, 1000000); \
     BENCHMARK_TEMPLATE(bench_sparrow_divide, T)->RangeMultiplier(10)->Range(100, 1000000); \
-    BENCHMARK_TEMPLATE(bench_sparrow_add_reuse, T)->RangeMultiplier(10)->Range(100, 1000000); \
-    BENCHMARK_TEMPLATE(bench_sparrow_subtract_reuse, T)->RangeMultiplier(10)->Range(100, 1000000); \
-    BENCHMARK_TEMPLATE(bench_sparrow_multiply_reuse, T)->RangeMultiplier(10)->Range(100, 1000000); \
-    BENCHMARK_TEMPLATE(bench_sparrow_divide_reuse, T)->RangeMultiplier(10)->Range(100, 1000000); \
     BENCHMARK_TEMPLATE(bench_xtensor_add, T)->RangeMultiplier(10)->Range(100, 1000000); \
     BENCHMARK_TEMPLATE(bench_xtensor_subtract, T)->RangeMultiplier(10)->Range(100, 1000000); \
     BENCHMARK_TEMPLATE(bench_xtensor_multiply, T)->RangeMultiplier(10)->Range(100, 1000000); \

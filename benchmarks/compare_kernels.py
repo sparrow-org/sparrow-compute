@@ -10,7 +10,7 @@ from pathlib import Path
 
 BENCH_RE = re.compile(
     r"^bench_(?P<impl>sparrow|xtensor)_(?P<op>add|subtract|multiply|divide)"
-    r"(?P<reuse>_reuse)?<(?P<dtype>[^>]+)>/(?P<size>\d+)$"
+    r"<(?P<dtype>[^>]+)>/(?P<size>\d+)$"
 )
 
 TYPE_ALIASES = {
@@ -82,7 +82,7 @@ def benchmark_filter(ops: list[str], dtypes: list[str], sizes: list[str]) -> str
     type_group = "|".join(re.escape(dtype) for dtype in dtypes)
     size_group = "|".join(re.escape(size) for size in sizes)
     return (
-        rf"^bench_(sparrow|xtensor)_({ops_group})(_reuse)?<({type_group})>/({size_group})$"
+        rf"^bench_(sparrow|xtensor)_({ops_group})<({type_group})>/({size_group})$"
     )
 
 
@@ -141,7 +141,7 @@ def collect_rows(payload: dict) -> dict[tuple[str, str, str], dict[str, float]]:
         if not match:
             continue
         key = (match.group("op"), match.group("dtype"), match.group("size"))
-        variant = f"{match.group('impl')}{match.group('reuse') or ''}"
+        variant = match.group("impl")
         rows.setdefault(key, {})[variant] = time_in_ns(bench)
     return rows
 
@@ -152,10 +152,8 @@ def print_table(rows: dict[tuple[str, str, str], dict[str, float]]) -> None:
         "type",
         "size",
         "sparrow",
-        "sparrow_reuse",
         "xtensor",
         "xtensor/sparrow",
-        "xtensor/sparrow_reuse",
     )
     print(" | ".join(header))
     print(" | ".join("-" * len(col) for col in header))
@@ -166,17 +164,14 @@ def print_table(rows: dict[tuple[str, str, str], dict[str, float]]) -> None:
 
     for (op, dtype, size), variants in sorted(rows.items(), key=sort_key):
         sparrow = variants.get("sparrow")
-        sparrow_reuse = variants.get("sparrow_reuse")
         xtensor = variants.get("xtensor")
         row = (
             op,
             dtype,
             size,
             format_ns(sparrow) if sparrow is not None else "-",
-            format_ns(sparrow_reuse) if sparrow_reuse is not None else "-",
             format_ns(xtensor) if xtensor is not None else "-",
             format_ratio(xtensor, sparrow),
-            format_ratio(xtensor, sparrow_reuse),
         )
         print(" | ".join(row))
 
