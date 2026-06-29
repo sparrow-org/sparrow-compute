@@ -21,12 +21,12 @@ jobs:
 
       - name: Configure benchmark build
         run: |
-          cmake -B build
-                -G Ninja
-                -DCMAKE_BUILD_TYPE=RelWithDebInfo
-                -DSPACROW_ENABLE_CODSPEED=ON
-                -DSPACROW_CODSPEED_MODE=simulation
-                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
+          cmake -B build \
+                -G Ninja \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DSPACROW_ENABLE_CODSPEED=ON \
+                -DSPACROW_CODSPEED_MODE=simulation \
+                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON \
 
       - name: Build benchmark target
         run: cmake --build build --target spacrow_bench

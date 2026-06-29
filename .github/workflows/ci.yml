@@ -18,11 +18,12 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -B build 
-                -G Ninja 
-                -DCMAKE_BUILD_TYPE=RelWithDebInfo
-                -DSPACROW_ENABLE_CODSPEED=OFF
-                -DSPACROW_CODSPEED_MODE=off -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
+          cmake -B build \
+                -G Ninja \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DSPACROW_ENABLE_CODSPEED=OFF \
+                -DSPACROW_CODSPEED_MODE=OFF \
+                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
 
       - name: Build tests
         run: cmake --build build/ --target spacrow_tests
