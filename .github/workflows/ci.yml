@@ -14,13 +14,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configure
-        run: cmake --preset relwithdebinfo-no-codspeed
+        run: |
+          cmake -B build 
+                -G Ninja 
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo
+                -DSPACROW_ENABLE_CODSPEED=OFF
+                -DSPACROW_CODSPEED_MODE=off -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
 
       - name: Build tests
-        run: cmake --build --preset relwithdebinfo-no-codspeed --target spacrow_tests
+        run: cmake --build build/ --target spacrow_tests
 
       - name: Run tests
-        run: ctest --preset relwithdebinfo-no-codspeed
+        run: ctest --test-dir build --output-on-failure

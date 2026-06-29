@@ -17,13 +17,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configure benchmark build
-        run: cmake --preset relwithdebinfo-simulation
+        run: |
+          cmake -B build
+                -G Ninja
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo
+                -DSPACROW_ENABLE_CODSPEED=ON
+                -DSPACROW_CODSPEED_MODE=simulation
+                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
 
       - name: Build benchmark target
-        run: cmake --build --preset relwithdebinfo-simulation --target spacrow_bench
+        run: cmake --build build --target spacrow_bench
 
       - name: Run CodSpeed benchmarks
         uses: CodSpeedHQ/action@v4
