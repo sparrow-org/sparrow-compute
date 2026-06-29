@@ -1,0 +1,11 @@
+{
+    "cmake.buildDirectory": "${workspaceFolder}/build/${buildKit}/${buildType}",
+    "cmake.copyCompileCommands": "${workspaceFolder}/build/compile_commands.json",
+    "cmake.loadCompileCommands": true,
+    "cmake.configureArgs": ["-DFETCH_DEPENDENCIES_WITH_CMAKE=ON"],
+    "clangd.arguments": [
+        "-pretty",
+        "--background-index",
+        "--compile-commands-dir=${workspaceFolder}/build/"
+    ]
+}

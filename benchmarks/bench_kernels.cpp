@@ -9,7 +9,7 @@
 #include <xtensor/core/xeval.hpp>
 #include <xtensor/core/xnoalias.hpp>
 
-#include "spacrow/kernels.hpp"
+#include "sparrow-compute/kernels.hpp"
 
 // -------------------------------------------------------------------------
 // Test data generation
@@ -41,7 +41,7 @@ void bench_sparrow_add(benchmark::State& state)
 
     for (auto _ : state)
     {
-        auto r = spacrow::add(a, b);
+        auto r = sparrow::compute::add(a, b);
         benchmark::DoNotOptimize(r);
     }
     state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
@@ -59,7 +59,7 @@ void bench_sparrow_add(benchmark::State& state)
 
         for (auto _ : state)
         {
-            auto r = spacrow::subtract(a, b);
+            auto r = sparrow::compute::subtract(a, b);
             benchmark::DoNotOptimize(r);
         }
         state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
@@ -77,7 +77,7 @@ void bench_sparrow_add(benchmark::State& state)
 
         for (auto _ : state)
         {
-            auto r = spacrow::multiply(a, b);
+            auto r = sparrow::compute::multiply(a, b);
             benchmark::DoNotOptimize(r);
         }
         state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));
@@ -95,7 +95,7 @@ void bench_sparrow_add(benchmark::State& state)
 
         for (auto _ : state)
         {
-            auto r = spacrow::divide(a, b);
+            auto r = sparrow::compute::divide(a, b);
             benchmark::DoNotOptimize(r);
         }
         state.SetItemsProcessed(static_cast<int64_t>(state.iterations() * n));

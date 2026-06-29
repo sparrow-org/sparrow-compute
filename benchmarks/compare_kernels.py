@@ -24,11 +24,11 @@ TYPE_ALIASES = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Compare spacrow sparrow-backed kernels against pure xtensor kernels."
+        description="Compare sparrow-compute sparrow-backed kernels against pure xtensor kernels."
     )
     parser.add_argument(
         "--benchmark",
-        default="build/default/spacrow_bench",
+        default="build/default/sparrow-compute_bench",
         help="Path to the benchmark binary.",
     )
     parser.add_argument(
@@ -73,7 +73,7 @@ def normalize_types(dtypes: list[str]) -> list[str]:
 
 
 def build_benchmark(build_dir: str) -> None:
-    cmd = ["cmake", "--build", build_dir, "--target", "spacrow_bench"]
+    cmd = ["cmake", "--build", build_dir, "--target", "sparrow-compute_bench"]
     subprocess.run(cmd, check=True)
 
 

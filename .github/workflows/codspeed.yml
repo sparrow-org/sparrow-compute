@@ -30,15 +30,15 @@ jobs:
           cmake -B build \
                 -G Ninja \
                 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                -DSPACROW_ENABLE_CODSPEED=ON \
-                -DSPACROW_CODSPEED_MODE=simulation \
+                -DSPARROW_COMPUTE_ENABLE_CODSPEED=ON \
+                -DSPARROW_COMPUTE_CODSPEED_MODE=simulation \
                 -DFETCH_DEPENDENCIES_WITH_CMAKE=ON \
 
       - name: Build benchmark target
-        run: cmake --build build --target spacrow_bench
+        run: cmake --build build --target sparrow-compute_bench
 
       - name: Run CodSpeed benchmarks
         uses: CodSpeedHQ/action@v4
         with:
           mode: simulation
-          run: ./build/spacrow_bench
+          run: ./build/sparrow-compute_bench

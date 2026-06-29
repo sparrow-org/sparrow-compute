@@ -12,7 +12,7 @@
 #include <sparrow/layout/array_access.hpp>
 #include <sparrow/primitive_array.hpp>
 
-namespace spacrow
+namespace sparrow::compute
 {
     namespace detail
     {
@@ -57,4 +57,4 @@ namespace spacrow
         sparrow::u8_buffer<T> buf(typed, n, alloc);
         return sparrow::primitive_array<T>(std::move(buf), n, /*nullable=*/false);
     }
-}  // namespace spacrow
+}  // namespace sparrow::compute

@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(spacrow LANGUAGES C CXX)
+project(sparrow-compute LANGUAGES C CXX)
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-message(STATUS "🔧 spacrow: C++20 project with sparrow + xtensor compute kernels")
+message(STATUS "🔧 sparrow-compute: C++20 project with sparrow + xtensor compute kernels")
 
 # ---------------------------------------------------------------------------
 # Global settings
@@ -22,44 +22,44 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(
-    SPACROW_ENABLE_CODSPEED
+    SPARROW_COMPUTE_ENABLE_CODSPEED
     "Enable CodSpeed integration and allow CODSPEED_ENABLED to be defined"
     ON
 )
 
 set(
-    SPACROW_CODSPEED_MODE
+    SPARROW_COMPUTE_CODSPEED_MODE
     "off"
     CACHE STRING
     "CodSpeed benchmark mode: off, instrumentation, simulation, memory, or walltime"
 )
 set_property(
-    CACHE SPACROW_CODSPEED_MODE
+    CACHE SPARROW_COMPUTE_CODSPEED_MODE
     PROPERTY STRINGS off instrumentation simulation memory walltime
 )
 
-if(SPACROW_ENABLE_CODSPEED)
-    set(SPACROW_EFFECTIVE_CODSPEED_MODE "${SPACROW_CODSPEED_MODE}")
+if(SPARROW_COMPUTE_ENABLE_CODSPEED)
+    set(SPARROW_COMPUTE_EFFECTIVE_CODSPEED_MODE "${SPARROW_COMPUTE_CODSPEED_MODE}")
 else()
-    set(SPACROW_EFFECTIVE_CODSPEED_MODE "off")
-    if(NOT SPACROW_CODSPEED_MODE STREQUAL "off")
+    set(SPARROW_COMPUTE_EFFECTIVE_CODSPEED_MODE "off")
+    if(NOT SPARROW_COMPUTE_CODSPEED_MODE STREQUAL "off")
         message(
             WARNING
-            "SPACROW_ENABLE_CODSPEED=OFF forces CodSpeed off; ignoring "
-            "SPACROW_CODSPEED_MODE=${SPACROW_CODSPEED_MODE}."
+            "SPARROW_COMPUTE_ENABLE_CODSPEED=OFF forces CodSpeed off; ignoring "
+            "SPARROW_COMPUTE_CODSPEED_MODE=${SPARROW_COMPUTE_CODSPEED_MODE}."
         )
     endif()
 endif()
 
-message(STATUS "🔧 CodSpeed enabled: ${SPACROW_ENABLE_CODSPEED}")
-message(STATUS "🔧 CodSpeed mode: ${SPACROW_CODSPEED_MODE}")
+message(STATUS "🔧 CodSpeed enabled: ${SPARROW_COMPUTE_ENABLE_CODSPEED}")
+message(STATUS "🔧 CodSpeed mode: ${SPARROW_COMPUTE_CODSPEED_MODE}")
 
 # ---------------------------------------------------------------------------
 # Build options
 # ---------------------------------------------------------------------------
-option(BUILD_TESTS "Build spacrow test suite" ON)
+option(BUILD_TESTS "Build sparrow-compute test suite" ON)
 message(STATUS "🔧 Build tests: ${BUILD_TESTS}")
-option(BUILD_BENCHMARKS "Build spacrow benchmark suite" ON)
+option(BUILD_BENCHMARKS "Build sparrow-compute benchmark suite" ON)
 message(STATUS "🔧 Build benchmarks: ${BUILD_BENCHMARKS}")
 
 # ---------------------------------------------------------------------------
@@ -68,25 +68,25 @@ message(STATUS "🔧 Build benchmarks: ${BUILD_BENCHMARKS}")
 include(external_dependencies)
 
 # ---------------------------------------------------------------------------
-# spacrow library (header-only for now)
+# sparrow-compute library (header-only for now)
 # ---------------------------------------------------------------------------
-add_library(spacrow INTERFACE)
-target_include_directories(spacrow INTERFACE
+add_library(sparrow-compute INTERFACE)
+target_include_directories(sparrow-compute INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
-target_link_libraries(spacrow INTERFACE sparrow)
-# Enable xtensor SIMD acceleration for consumers of spacrow.
-target_compile_definitions(spacrow INTERFACE XTENSOR_USE_XSIMD)
-target_link_libraries(spacrow INTERFACE xtensor xsimd)
+target_link_libraries(sparrow-compute INTERFACE sparrow)
+# Enable xtensor SIMD acceleration for consumers of sparrow-compute.
+target_compile_definitions(sparrow-compute INTERFACE XTENSOR_USE_XSIMD)
+target_link_libraries(sparrow-compute INTERFACE xtensor xsimd)
 
 # ---------------------------------------------------------------------------
 # Demo executable
 # ---------------------------------------------------------------------------
-add_executable(spacrow_demo examples/demo_kernels.cpp)
-target_link_libraries(spacrow_demo PRIVATE spacrow)
-set_target_properties(spacrow_demo PROPERTIES
+add_executable(sparrow-compute_demo examples/demo_kernels.cpp)
+target_link_libraries(sparrow-compute_demo PRIVATE sparrow-compute)
+set_target_properties(sparrow-compute_demo PROPERTIES
     CXX_EXTENSIONS OFF
-    FOLDER "spacrow"
+    FOLDER "sparrow-compute"
 )
 
 # ---------------------------------------------------------------------------
@@ -94,28 +94,28 @@ set_target_properties(spacrow_demo PROPERTIES
 # ---------------------------------------------------------------------------
 enable_testing()
 
-add_executable(spacrow_tests tests/test_kernels.cpp)
-target_link_libraries(spacrow_tests PRIVATE
-    spacrow
+add_executable(sparrow-compute_tests tests/test_kernels.cpp)
+target_link_libraries(sparrow-compute_tests PRIVATE
+    sparrow-compute
     GTest::gtest_main
 )
-set_target_properties(spacrow_tests PROPERTIES
+set_target_properties(sparrow-compute_tests PROPERTIES
     CXX_EXTENSIONS OFF
-    FOLDER "spacrow"
+    FOLDER "sparrow-compute"
 )
 
 include(GoogleTest)
-gtest_discover_tests(spacrow_tests)
+gtest_discover_tests(sparrow-compute_tests)
 
 # ---------------------------------------------------------------------------
 # Benchmarks
 # ---------------------------------------------------------------------------
-add_executable(spacrow_bench benchmarks/bench_kernels.cpp)
-target_link_libraries(spacrow_bench PRIVATE
-    spacrow
+add_executable(sparrow-compute_bench benchmarks/bench_kernels.cpp)
+target_link_libraries(sparrow-compute_bench PRIVATE
+    sparrow-compute
     benchmark::benchmark
 )
-set_target_properties(spacrow_bench PROPERTIES
+set_target_properties(sparrow-compute_bench PROPERTIES
     CXX_EXTENSIONS OFF
-    FOLDER "spacrow"
+    FOLDER "sparrow-compute"
 )

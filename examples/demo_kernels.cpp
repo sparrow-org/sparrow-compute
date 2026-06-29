@@ -1,12 +1,12 @@
 /// @file demo_kernels.cpp
-/// @brief Demonstrates spacrow compute kernels over sparrow primitive arrays.
+/// @brief Demonstrates sparrow-compute compute kernels over sparrow primitive arrays.
 
 #include <iostream>
 #include <vector>
 
 #include <sparrow/primitive_array.hpp>
 
-#include "spacrow/kernels.hpp"
+#include "sparrow-compute/kernels.hpp"
 
 namespace
 {
@@ -43,10 +43,10 @@ namespace
         print("a        ", a);
         print("b        ", b);
 
-        auto sum = spacrow::add(a, b);
-        auto diff = spacrow::subtract(a, b);
-        auto prod = spacrow::multiply(a, b);
-        auto quot = spacrow::divide(a, b);
+        auto sum = sparrow::compute::add(a, b);
+        auto diff = sparrow::compute::subtract(a, b);
+        auto prod = sparrow::compute::multiply(a, b);
+        auto quot = sparrow::compute::divide(a, b);
 
         print("a + b    ", sum);
         print("a - b    ", diff);
@@ -62,10 +62,10 @@ namespace
 
         print("a        ", a);
         print("b        ", b);
-        print("a + b    ", spacrow::add(a, b));
-        print("a - b    ", spacrow::subtract(a, b));
-        print("a * b    ", spacrow::multiply(a, b));
-        print("a / b    ", spacrow::divide(a, b));
+        print("a + b    ", sparrow::compute::add(a, b));
+        print("a - b    ", sparrow::compute::subtract(a, b));
+        print("a * b    ", sparrow::compute::multiply(a, b));
+        print("a / b    ", sparrow::compute::divide(a, b));
     }
 }  // namespace
 

@@ -7,9 +7,9 @@
 #include <sparrow/primitive_array.hpp>
 #include <sparrow/u8_buffer.hpp>
 
-#include "spacrow/xtensor_adaptor.hpp"
+#include "sparrow-compute/xtensor_adaptor.hpp"
 
-namespace spacrow
+namespace sparrow::compute
 {
     namespace detail
     {
@@ -19,7 +19,7 @@ namespace spacrow
         {
             if (a.size() != b.size())
             {
-                throw std::invalid_argument("spacrow kernels require equal-length inputs");
+                throw std::invalid_argument("sparrow-compute kernels require equal-length inputs");
             }
         }
     }  // namespace detail
@@ -101,4 +101,4 @@ namespace spacrow
         return to_sparrow<T>(a_view / b_view);
     }
 
-}  // namespace spacrow
+}  // namespace sparrow::compute
