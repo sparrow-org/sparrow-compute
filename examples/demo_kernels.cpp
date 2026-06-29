@@ -10,7 +10,7 @@
 
 namespace
 {
-    template <class T>
+    template <sparrow::primitive_type T>
     std::vector<T> to_vector(const sparrow::primitive_array<T>& arr)
     {
         std::vector<T> v;
@@ -22,7 +22,7 @@ namespace
         return v;
     }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void print(const char* label, const sparrow::primitive_array<T>& arr)
     {
         std::cout << label << ": [ ";

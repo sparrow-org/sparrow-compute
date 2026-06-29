@@ -14,7 +14,7 @@
 // Test data generation
 // -------------------------------------------------------------------------
 
-template <class T>
+template <typename T>
 std::vector<T> make_input(std::size_t n, T start)
 {
     std::vector<T> v(n);
@@ -29,10 +29,10 @@ std::vector<T> make_input(std::size_t n, T start)
 // Sparrow-array kernels (functional: return a new sparrow array)
 // -------------------------------------------------------------------------
 
-template <class T>
+template <sparrow::primitive_type T>
 void bench_sparrow_add(benchmark::State& state)
 {
-    const std::size_t n = static_cast<std::size_t>(state.range(0));
+    const auto n = static_cast<std::size_t>(state.range(0));
     auto va = make_input<T>(n, T{1});
     auto vb = make_input<T>(n, T{2});
     sparrow::primitive_array<T> a(va);
@@ -47,10 +47,10 @@ void bench_sparrow_add(benchmark::State& state)
     state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
 }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_sparrow_subtract(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         sparrow::primitive_array<T> a(va);
@@ -65,10 +65,10 @@ void bench_sparrow_add(benchmark::State& state)
         state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
     }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_sparrow_multiply(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         sparrow::primitive_array<T> a(va);
@@ -83,10 +83,10 @@ void bench_sparrow_add(benchmark::State& state)
         state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
     }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_sparrow_divide(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         sparrow::primitive_array<T> a(va);
@@ -105,10 +105,10 @@ void bench_sparrow_add(benchmark::State& state)
     // xtensor-vector kernels (functional: return a new xt::xtensor<T, 1>)
     // -------------------------------------------------------------------------
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_xtensor_add(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         xt::xtensor<T, 1> a = xt::adapt(va, std::array<std::size_t, 1>{n});
@@ -123,10 +123,10 @@ void bench_sparrow_add(benchmark::State& state)
         state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
     }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_xtensor_subtract(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         xt::xtensor<T, 1> a = xt::adapt(va, std::array<std::size_t, 1>{n});
@@ -141,10 +141,10 @@ void bench_sparrow_add(benchmark::State& state)
         state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
     }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_xtensor_multiply(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         xt::xtensor<T, 1> a = xt::adapt(va, std::array<std::size_t, 1>{n});
@@ -159,10 +159,10 @@ void bench_sparrow_add(benchmark::State& state)
         state.SetBytesProcessed(static_cast<int64_t>(state.iterations() * n * sizeof(T)));
     }
 
-    template <class T>
+    template <sparrow::primitive_type T>
     void bench_xtensor_divide(benchmark::State& state)
     {
-        const std::size_t n = static_cast<std::size_t>(state.range(0));
+        const auto n = static_cast<std::size_t>(state.range(0));
         auto va = make_input<T>(n, T{1});
         auto vb = make_input<T>(n, T{2});
         xt::xtensor<T, 1> a = xt::adapt(va, std::array<std::size_t, 1>{n});
@@ -196,10 +196,10 @@ REGISTER_BENCHMARKS(int32_t)
 // Benchmarks are in milliseconds so the per-call costs are visible.
 // =========================================================================
 
-template <class T>
+template <sparrow::primitive_type T>
 void bench_breakdown_allocate(benchmark::State& state)
 {
-    const std::size_t n = 1000000;
+    const auto n = 1000000;
     using alloc_type = typename sparrow::u8_buffer<T>::default_allocator;
     for (auto _ : state) {
         alloc_type alloc;
@@ -210,10 +210,10 @@ void bench_breakdown_allocate(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(n));
 }
 
-template <class T>
+template <sparrow::primitive_type T>
 void bench_breakdown_eval(benchmark::State& state)
 {
-    const std::size_t n = 1000000;
+    const auto n = 1000000;
     auto va = make_input<T>(n, T{1});
     auto vb = make_input<T>(n, T{2});
     sparrow::primitive_array<T> a(va);
@@ -235,10 +235,10 @@ void bench_breakdown_eval(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(n));
 }
 
-template <class T>
+template <sparrow::primitive_type T>
 void bench_breakdown_arrow_ctor(benchmark::State& state)
 {
-    const std::size_t n = 1000000;
+    const auto n = 1000000;
     using alloc_type = typename sparrow::u8_buffer<T>::default_allocator;
 
     for (auto _ : state) {
