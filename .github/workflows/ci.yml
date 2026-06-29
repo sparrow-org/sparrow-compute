@@ -14,7 +14,6 @@ jobs:
 
     steps:
       - name: Install GCC
-        if: matrix.compiler == 'gcc'
         uses: egor-tensin/setup-gcc@v2
         with:
           version: 16
