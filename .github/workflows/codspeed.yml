@@ -41,4 +41,4 @@ jobs:
         uses: CodSpeedHQ/action@v4
         with:
           mode: simulation
-          run: ./build/relwithdebinfo-simulation/spacrow_bench
+          run: ./build/spacrow_bench
