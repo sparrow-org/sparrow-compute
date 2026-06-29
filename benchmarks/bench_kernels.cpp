@@ -5,6 +5,7 @@
 #include <sparrow/primitive_array.hpp>
 
 #include <xtensor/containers/xtensor.hpp>
+#include <xtensor/containers/xbuffer_adaptor.hpp>
 #include <xtensor/core/xeval.hpp>
 #include <xtensor/core/xnoalias.hpp>
 
@@ -225,7 +226,7 @@ void bench_breakdown_eval(benchmark::State& state)
     alloc_type alloc;
     auto* raw = alloc.allocate(n * sizeof(T));
     auto* ptr = reinterpret_cast<T*>(raw);
-    auto view = xt::adapt(ptr, n, xt::no_ownership());
+    auto view = xt::adapt(xt::xbuffer_adaptor<T*, xt::no_ownership>(ptr, static_cast<std::size_t>(n)));
 
     for (auto _ : state) {
         xt::noalias(view) = expr;

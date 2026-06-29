@@ -3,6 +3,7 @@
 #include <cstddef>
 
 #include <xtensor/containers/xadapt.hpp>
+#include <xtensor/containers/xbuffer_adaptor.hpp>
 #include <xtensor/containers/xtensor.hpp>
 #include <xtensor/core/xnoalias.hpp>
 
@@ -34,7 +35,7 @@ namespace spacrow
     [[nodiscard]] auto as_xtensor_view(const sparrow::primitive_array<T>& arr)
     {
         const auto data = detail::view_data(arr);
-        return xt::adapt(data.data(), data.size(), xt::no_ownership());
+        return xt::adapt(xt::xbuffer_adaptor<const T*, xt::no_ownership>(data.data(), data.size()));
     }
 
     /// Build a sparrow primitive array from an xtensor expression
@@ -50,7 +51,7 @@ namespace spacrow
         auto* raw_bytes = alloc.allocate(n * sizeof(T));
         T* typed = reinterpret_cast<T*>(raw_bytes);
 
-        auto view = xt::adapt(typed, n, xt::no_ownership());
+        auto view = xt::adapt(xt::xbuffer_adaptor<T*, xt::no_ownership>(typed, n));
         xt::noalias(view) = std::forward<E>(expr);
 
         sparrow::u8_buffer<T> buf(typed, n, alloc);
