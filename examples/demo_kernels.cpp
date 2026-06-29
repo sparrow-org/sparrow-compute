@@ -6,7 +6,7 @@
 
 #include <sparrow/primitive_array.hpp>
 
-#include "sparrow-compute/kernels.hpp"
+#include "sparrow-compute/arithmetic.hpp"
 
 namespace
 {

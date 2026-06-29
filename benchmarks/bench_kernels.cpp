@@ -9,7 +9,7 @@
 #include <xtensor/core/xeval.hpp>
 #include <xtensor/core/xnoalias.hpp>
 
-#include "sparrow-compute/kernels.hpp"
+#include "sparrow-compute/arithmetic.hpp"
 
 // -------------------------------------------------------------------------
 // Test data generation

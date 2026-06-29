@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <stdexcept>
 
 #include <xtensor/containers/xtensor.hpp>
@@ -22,6 +23,17 @@ namespace sparrow::compute
                 throw std::invalid_argument("sparrow-compute kernels require equal-length inputs");
             }
         }
+
+        /// Shared implementation for element-wise binary operations.
+        template <sparrow::primitive_type T, typename BinaryOp>
+        [[nodiscard]] sparrow::primitive_array<T>
+        binary_op(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b, BinaryOp op)
+        {
+            ensure_same_size(a, b);
+            const auto a_view = as_xtensor_view(a);
+            const auto b_view = as_xtensor_view(b);
+            return to_sparrow<T>(op(a_view, b_view));
+        }
     }  // namespace detail
 
     // -------------------------------------------------------------------------
@@ -40,10 +52,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     add(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        detail::ensure_same_size(a, b);
-        const auto a_view = as_xtensor_view(a);
-        const auto b_view = as_xtensor_view(b);
-        return to_sparrow<T>(a_view + b_view);
+        return detail::binary_op(a, b, std::plus<>{});
     }
 
     /**
@@ -58,10 +67,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     subtract(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        detail::ensure_same_size(a, b);
-        const auto a_view = as_xtensor_view(a);
-        const auto b_view = as_xtensor_view(b);
-        return to_sparrow<T>(a_view - b_view);
+        return detail::binary_op(a, b, std::minus<>{});
     }
 
     /**
@@ -76,10 +82,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     multiply(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        detail::ensure_same_size(a, b);
-        const auto a_view = as_xtensor_view(a);
-        const auto b_view = as_xtensor_view(b);
-        return to_sparrow<T>(a_view * b_view);
+        return detail::binary_op(a, b, std::multiplies<>{});
     }
 
     /**
@@ -95,10 +98,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     divide(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        detail::ensure_same_size(a, b);
-        const auto a_view = as_xtensor_view(a);
-        const auto b_view = as_xtensor_view(b);
-        return to_sparrow<T>(a_view / b_view);
+        return detail::binary_op(a, b, std::divides<>{});
     }
 
 }  // namespace sparrow::compute
