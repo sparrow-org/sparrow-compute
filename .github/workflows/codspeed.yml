@@ -1,0 +1,44 @@
+name: CodSpeed
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  benchmarks:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Install GCC
+        uses: egor-tensin/setup-gcc@v2
+        with:
+          version: 16
+          platform: x64
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure benchmark build
+        run: |
+          cmake -B build \
+                -G Ninja \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DSPARROW_COMPUTE_ENABLE_CODSPEED=ON \
+                -DSPARROW_COMPUTE_CODSPEED_MODE=simulation \
+                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON \
+
+      - name: Build benchmark target
+        run: cmake --build build --target sparrow-compute_bench
+
+      - name: Run CodSpeed benchmarks
+        uses: CodSpeedHQ/action@v4
+        with:
+          mode: simulation
+          run: ./build/sparrow-compute_bench

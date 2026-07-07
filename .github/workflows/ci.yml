@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install GCC
+        uses: egor-tensin/setup-gcc@v2
+        with:
+          version: 16
+          platform: x64
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure
+        run: |
+          cmake -B build \
+                -G Ninja \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DSPARROW_COMPUTE_ENABLE_CODSPEED=OFF \
+                -DSPARROW_COMPUTE_CODSPEED_MODE=OFF \
+                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
+
+      - name: Build tests
+        run: cmake --build build/ --target sparrow-compute_tests
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
