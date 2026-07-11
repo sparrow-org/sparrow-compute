@@ -14,25 +14,30 @@ namespace sparrow::compute
 {
     namespace detail
     {
-        // Throws an exception if the two arrays do not have the same size.
         template <typename T>
-        inline void ensure_same_size(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
+        concept primitive_array_c = sparrow::is_primitive_array_v<std::decay_t<T>>;
+
+        // Throws an exception if the two arrays do not have the same size.
+        template <primitive_array_c A, primitive_array_c... Args>
+        inline void ensure_same_size(const A& a, const Args&... args)
         {
-            if (a.size() != b.size())
+            if (!((a.size() == args.size()) && ...))
             {
                 throw std::invalid_argument("sparrow-compute kernels require equal-length inputs");
             }
         }
+    
+        template <typename Func, primitive_array_c... Args>
+        using sparrow_op_return_type =
+            decltype(std::declval<Func>()(typename std::decay_t<Args>::inner_value_type()...));
 
-        /// Shared implementation for element-wise binary operations.
-        template <sparrow::primitive_type T, typename BinaryOp>
-        [[nodiscard]] sparrow::primitive_array<T>
-        binary_op(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b, BinaryOp op)
+        template <typename Func, primitive_array_c... Args>
+        [[nodiscard]] sparrow::primitive_array<sparrow_op_return_type<Func, Args...>>
+        sparrow_op(Func&& func, Args&&... args)
         {
-            ensure_same_size(a, b);
-            const auto a_view = as_xtensor_view(a);
-            const auto b_view = as_xtensor_view(b);
-            return to_sparrow<T>(op(a_view, b_view));
+            ensure_same_size(args...);
+            using return_type = sparrow_op_return_type<Func, Args...>;
+            return to_sparrow<return_type>(func(as_xtensor_view(std::forward<Args>(args))...));
         }
     }  // namespace detail
 
@@ -52,7 +57,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     add(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        return detail::binary_op(a, b, std::plus<>{});
+        return detail::sparrow_op(std::plus{}, a, b);
     }
 
     /**
@@ -67,7 +72,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     subtract(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        return detail::binary_op(a, b, std::minus<>{});
+        return detail::sparrow_op(std::minus{}, a, b);
     }
 
     /**
@@ -82,7 +87,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     multiply(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        return detail::binary_op(a, b, std::multiplies<>{});
+        return detail::sparrow_op(std::multiplies<>{}, a, b);
     }
 
     /**
@@ -98,7 +103,7 @@ namespace sparrow::compute
     [[nodiscard]] sparrow::primitive_array<T>
     divide(const sparrow::primitive_array<T>& a, const sparrow::primitive_array<T>& b)
     {
-        return detail::binary_op(a, b, std::divides<>{});
+        return detail::sparrow_op(std::divides<>{}, a, b);
     }
 
 }  // namespace sparrow::compute
