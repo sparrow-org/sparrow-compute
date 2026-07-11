@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash -e -l {0}
+
 jobs:
   build-and-test:
     name: Build and test
@@ -22,14 +26,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Set conda environment
+        uses: mamba-org/setup-micromamba@main
+        with:
+          environment-name: myenv
+          environment-file: environment-dev.yml
+          init-shell: bash
+          cache-downloads: true
+
       - name: Configure
         run: |
           cmake -B build \
                 -G Ninja \
+                -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
+                -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
                 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
                 -DSPARROW_COMPUTE_ENABLE_CODSPEED=OFF \
                 -DSPARROW_COMPUTE_CODSPEED_MODE=OFF \
-                -DFETCH_DEPENDENCIES_WITH_CMAKE=ON
+                -DFETCH_DEPENDENCIES_WITH_CMAKE=OFF
 
       - name: Build tests
         run: cmake --build build/ --target sparrow-compute_tests

@@ -24,7 +24,7 @@ endif()
 option(
     SPARROW_COMPUTE_ENABLE_CODSPEED
     "Enable CodSpeed integration and allow CODSPEED_ENABLED to be defined"
-    ON
+    OFF
 )
 
 set(
@@ -59,7 +59,7 @@ message(STATUS "🔧 CodSpeed mode: ${SPARROW_COMPUTE_CODSPEED_MODE}")
 # ---------------------------------------------------------------------------
 option(BUILD_TESTS "Build sparrow-compute test suite" ON)
 message(STATUS "🔧 Build tests: ${BUILD_TESTS}")
-option(BUILD_BENCHMARKS "Build sparrow-compute benchmark suite" ON)
+option(BUILD_BENCHMARKS "Build sparrow-compute benchmark suite" OFF)
 message(STATUS "🔧 Build benchmarks: ${BUILD_BENCHMARKS}")
 
 # ---------------------------------------------------------------------------
@@ -74,10 +74,9 @@ add_library(sparrow-compute INTERFACE)
 target_include_directories(sparrow-compute INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
-target_link_libraries(sparrow-compute INTERFACE sparrow)
 # Enable xtensor SIMD acceleration for consumers of sparrow-compute.
 target_compile_definitions(sparrow-compute INTERFACE XTENSOR_USE_XSIMD)
-target_link_libraries(sparrow-compute INTERFACE xtensor xsimd)
+target_link_libraries(sparrow-compute INTERFACE xtensor xsimd sparrow::sparrow)
 
 # ---------------------------------------------------------------------------
 # Demo executable
@@ -92,30 +91,34 @@ set_target_properties(sparrow-compute_demo PROPERTIES
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
-enable_testing()
+if (BUILD_TESTS)
+    enable_testing()
 
-add_executable(sparrow-compute_tests tests/test_kernels.cpp)
-target_link_libraries(sparrow-compute_tests PRIVATE
-    sparrow-compute
-    GTest::gtest_main
-)
-set_target_properties(sparrow-compute_tests PROPERTIES
-    CXX_EXTENSIONS OFF
-    FOLDER "sparrow-compute"
-)
+    add_executable(sparrow-compute_tests tests/test_kernels.cpp)
+    target_link_libraries(sparrow-compute_tests PRIVATE
+        sparrow-compute
+        GTest::gtest_main
+    )
+    set_target_properties(sparrow-compute_tests PROPERTIES
+        CXX_EXTENSIONS OFF
+        FOLDER "sparrow-compute"
+    )
 
-include(GoogleTest)
-gtest_discover_tests(sparrow-compute_tests)
+    include(GoogleTest)
+    gtest_discover_tests(sparrow-compute_tests)
+endif()
 
 # ---------------------------------------------------------------------------
 # Benchmarks
 # ---------------------------------------------------------------------------
-add_executable(sparrow-compute_bench benchmarks/bench_kernels.cpp)
-target_link_libraries(sparrow-compute_bench PRIVATE
-    sparrow-compute
-    benchmark::benchmark
-)
-set_target_properties(sparrow-compute_bench PROPERTIES
-    CXX_EXTENSIONS OFF
-    FOLDER "sparrow-compute"
-)
+if (BUILD_BENCHMARKS)
+    add_executable(sparrow-compute_bench benchmarks/bench_kernels.cpp)
+    target_link_libraries(sparrow-compute_bench PRIVATE
+        sparrow-compute
+        benchmark::benchmark
+    )
+    set_target_properties(sparrow-compute_bench PROPERTIES
+        CXX_EXTENSIONS OFF
+        FOLDER "sparrow-compute"
+    )
+endif()
