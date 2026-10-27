@@ -35,6 +35,9 @@ project(
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 message(
     STATUS
     "🔧 sparrow-compute v${PROJECT_VERSION}: C++20 project with sparrow + xtensor compute kernels"
@@ -107,10 +110,55 @@ include(external_dependencies)
 add_library(sparrow-compute INTERFACE)
 target_include_directories(sparrow-compute INTERFACE
     $<BUILD_INTERFACE:${SPARROW_COMPUTE_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 # Enable xtensor SIMD acceleration for consumers of sparrow-compute.
 target_compile_definitions(sparrow-compute INTERFACE XTENSOR_USE_XSIMD)
-target_link_libraries(sparrow-compute INTERFACE xtensor xsimd sparrow)
+target_link_libraries(sparrow-compute INTERFACE xtensor xsimd sparrow::sparrow)
+
+# ---------------------------------------------------------------------------
+# Installation
+# ---------------------------------------------------------------------------
+set(SPARROW_COMPUTE_CMAKECONFIG_INSTALL_DIR
+    "${CMAKE_INSTALL_DATADIR}/cmake/sparrow-compute"
+    CACHE STRING "install path for sparrow-computeConfig.cmake"
+)
+
+install(
+    DIRECTORY "${SPARROW_COMPUTE_INCLUDE_DIR}/"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+install(
+    TARGETS sparrow-compute
+    EXPORT sparrow-computeTargets
+)
+
+install(
+    EXPORT sparrow-computeTargets
+    FILE sparrow-computeTargets.cmake
+    NAMESPACE sparrow-compute::
+    DESTINATION "${SPARROW_COMPUTE_CMAKECONFIG_INSTALL_DIR}"
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_LIST_DIR}/cmake/sparrow-computeConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/sparrow-computeConfig.cmake"
+    INSTALL_DESTINATION "${SPARROW_COMPUTE_CMAKECONFIG_INSTALL_DIR}"
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/sparrow-computeConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/sparrow-computeConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/sparrow-computeConfigVersion.cmake"
+    DESTINATION "${SPARROW_COMPUTE_CMAKECONFIG_INSTALL_DIR}"
+)
 
 # ---------------------------------------------------------------------------
 # Demo executable

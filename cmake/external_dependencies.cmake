@@ -202,6 +202,10 @@ if(FETCH_DEPENDENCIES_WITH_CMAKE STREQUAL "ON"
         EXCLUDE_FROM_ALL
     )
     FetchContent_MakeAvailable(sparrow)
+    if(TARGET sparrow AND NOT TARGET sparrow::sparrow)
+        add_library(sparrow::sparrow ALIAS sparrow)
+    endif()
+
     unset(BUILD_DOCS CACHE)
     unset(BUILD_EXAMPLES CACHE)
     unset(USE_DATE_POLYFILL CACHE)
